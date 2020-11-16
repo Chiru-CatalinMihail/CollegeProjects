@@ -1,0 +1,145 @@
+
+https://www.mathworks.com/matlabcentral/answers/65564-find-total-number-of-images-in-a-folder
+
+La task-ul 6 in eigenface_core am vrut initial sa nu fac cd in baza de date si sa creez calea pana la fiecare imagine de acolo insa nu stiu in ce sistem de operare se face verificarea si atunci nu imi pot da seama cum sa construiesc path-ul catre imagine (daca e linux as face strcat database_path, "/", i.jpg (unde i itereaza de la 1 la cate imagini avem), iar daca e Windows trebuie folosit un "\" intre cele 2)
+Am vrut sa folosesc cd pentru a ajunge cu usurinta la imagini insa am citit ca nu este o practica eficienta dpdv al debuggingului: https://www.mathworks.com/matlabcentral/answers/342202-read-all-files-from-a-folder-edit-them-and-save
+
+
+
+%calculul erorii pentru taskul 2 grafic 3
+      %varianta 1
+      %for a=1:m
+      %  for b=1:n
+      %    eroare(i)=eroare(i)+((A(a,b)-A_k(a,b))^2)/(m*n);
+      %  endfor
+      %endfor
+
+
+%initial la taskul 2 aveam:
+k=[1:1920:20:99 100:30:min(m,n)] si graficul sarea la valorile care nu mai mergeau din 1 in 1 (insert poza cu graficul)
+k=[1:min(m,n)] dim_k=size(k, 2) si for de la 1 la dim_k
+
+Taskul 6 faceam cu fullfile sa nu apara inadvertente in mutarea metodei in Windows insa la cateva
+imagini adauga un spatiu random "3 .jpg" si atunci am luat modelul folosit in checker pt verificare
+%obtine path-ul catre fiecare imagine in parte
+      %f = fullfile(database_path,  image)
+Am mai avut probleme si pentru ca nu faceam conversia rgb2gray
+
+Am incercat sa fac un if (cerinta==2||5) si sa rezolv taskul 5 in cadrul taskului 2 dar erau mult prea diferite graficele din cauza faptului ca mi-ar fi trebuit A_k maxim de la inceput si ar fi complicat implementarea taskului 2. Asa ca am decis sa le fac separat.
+
+Problema la taskul 5 este ca valoriile proprii ale lui Z sunt aceleasi indiferent daca avem k=1,2,3... , ele fiind shiftate cu o linie mai jos, dar cand facem diag si sum obtinem mereu acelasi lucru care impartit la el insusi scoate un grafic constant 1 asa ca a trebuit sa schimb implementarea pentru graficul 2 de la taskul 5.
+
+2 variante pentru taskurile 2 si 5 una in care este facut totul integral in taskul 2 (acestea sunt pastrate momentan si cea in care fiecare task este tratat individual):
+
+//varianta fara parametru cale
+
+Al patrulea grafic daca nu i se da save sau save as la prima deschidere a octavului nu se afiseaza dar exista acolo (INCARC PRINTSCREEN SA NU UIT)
+
+function task2(image)
+ 
+    A=double(imread(image));
+    [m n]=size(A);
+    [u, s, v] = svd(A);
+    
+    %transforma pe s in vector 
+    s=diag(s);
+    suma_numitor=sum(s);
+ 
+    %graficul 1
+    figure(1);
+    graph1=plot(s);
+    set(graph1,'LineWidth',2);
+    
+    for i=1:min(m,n)
+      %obtinem cate o comprimare pentru fiecare k
+      k(i)=i;
+      A_k = task1(image, i);
+      [u, s, v] = svd(A_k);
+      s=diag(s);
+      
+      %informatia data de primele k valori singulare//necesara pentru graficul 2
+      info(i)=sum(s)/suma_numitor;
+      
+      %eroarea aproximarii pentru matricea A//necesara pentru graficul 3
+      eroare(i)=sum(sum(((A-A_k).^2)/(m*n)));
+    endfor
+    
+    %graficul 2
+    figure(2);
+    graph2=plot(info);
+    set(graph2,'LineWidth',2);
+    
+    %graficul 3
+    figure(3);
+    graph3=plot(eroare);
+    set(graph3,'LineWidth',2);    
+    
+    compression_rate=(m*k+n*k+k)/(m*n);
+    
+    %graficul 4
+    figure(4);
+    graph4=plot(compression_rate);
+    set(graph4,'LineWidth',2);    
+    
+end
+
+
+
+function task5(image)
+  
+    A=double(imread(image));
+    [m n]=size(A);
+  
+   %obtinem vectorul miu// pasii 1-2 de la cerinta 3
+   for i=1:m
+       linia_crt=A(i,:);
+       miu(i)=sum(linia_crt)/n;
+       A(i,:)=A(i,:)-miu(i);    
+    endfor
+  
+    [A s]=task3(image, min(m,n));
+    
+    %transforma pe s in vector 
+    s=diag(s);
+    
+    %graficul 1
+    figure(1);
+    graph1=plot(s);
+    set(graph1,'LineWidth',2);
+   
+    
+    for i=1:min(m,n)
+      [A_k s]=task3(image, i);
+      k(i)=i;
+      info(i)=sum(diag(s(1:k(i),1:k(i))))/sum(diag(s));
+    endfor
+    
+    %graficul 2
+    figure(2);
+    graph2=plot(info);
+    set(graph2,'LineWidth',2);
+    
+    for i=1:min(m,n)
+    
+      %obtinem cate o comprimare pentru fiecare k
+      k(i)=i;
+      [A_k s]= task4(image, i);
+      
+      %eroarea aproximarii pentru matricea A//necesara pentru graficul 3
+      eroare(i)=sum(sum(((A-A_k).^2)/(m*n)));
+    
+    endfor
+    
+    %graficul 3
+    figure(3);
+    graph3=plot(eroare);
+    set(graph3,'LineWidth',2);    
+    
+    compression_rate=(2*k+1)/n;
+    
+    %graficul 4
+    figure(4);
+    graph4=plot(compression_rate);
+    set(graph4,'LineWidth',2);
+
+end
