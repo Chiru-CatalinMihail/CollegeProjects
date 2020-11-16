@@ -1,0 +1,32 @@
+TASK-UL 1:
+	Folosim argumentul "-ascii" pentru a forta fisierele sa fie tratate
+	ca fisiere ASCII indiferent de extensia lor.
+       Am luat aceasta masura ca urmare a faptului ca daca aplicam size(points)
+	utilizand load simplu obtinem rezultatul ans= 1 1, ceea ce este fals
+	ar insemna ca in points exista un singur element. Fortand cu ASCII se
+	obtine o ans=53 3 (Adevarat) points este o matrice cu 3 coloane.
+      Aceasta idee mi-a venit citind ghidul de ajutor pentru load de pe matlab:
+	https://www.mathworks.com/help/matlab/ref/load.html
+
+TASK-UL 2:
+	Majoritatea implementarii este explicata in functie.
+	Am vrut sa calculez si sumele de ox oy si oz in felul in care am
+	calculat numarul de puncte din jurul unui centroid, pe un prototip
+	de tipul:
+	   suma_ox=sum(points(proximity==i)(1)) 
+	   (adica sa fac suma fiecarei coloane in functie de valoarea de adevar
+	   a proximity==i) //doream asta pentru a reduce complexitatea
+	   algoritmului (eliminam un for si un if) insa nu mi-am dat seama in
+	   ce fel pot implementa acest lucru si am decis sa parcurg mai simplu,
+	   dar mai ineficient.
+
+TASK-URILE 3, 4, 5:
+	Sunt directe, repeta algoritmii de la task-ul 2 si modul de citire de
+	la task-ul unul. Ele se bazeaza pe task-urile anterioare si se rezolva
+	in putine comenzi.
+	
+LA TASK-UL 3:
+	Modul de utilizare al scatter3 se bazeaza pe comentariile din sectiunea
+	help din matlab de la scatter3 si raspunsul unui admin la diverse
+	exercitii: 
+https://www.mathworks.com/matlabcentral/answers/233084-changing-color-of-the-points-in-scatter3
