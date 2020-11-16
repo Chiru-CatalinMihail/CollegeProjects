@@ -1,0 +1,58 @@
+Chiru Catalin-Mihail
+322 CB
+
+Initial am gandit o implementare avand in minte implementarea C a tabelei Hash (literele pentru un
+dictionar si inserarea cuvintelor in functie de prima lor litera). Doream ca  lista cu "litere" sa
+corespunda camerelor si in interiorul acesteia celelalte liste sa reprezinte datele despre temperatura
+si despre umiditate. Am renuntat deoarece, incercand sa fac mi s-a parut o complicare a problemei, sa
+gasesc un mod de a dispune camera si valorile sub forma cheie si valoare pentru HashMap. Iar, in ceea
+ce priveste HashSet am vazut un exemplu online care se comporta ca un tip specific de tabela hash din
+C, cea in care prima lista pointeaza catre un element, a doua catre doua, a treia catre 4 ... a na
+catre 2^n-1 elemente, ceea ce nu m-ar fi ajutat, in viziunea mea, in rezolvarea temei, doream un hash
+table care sa ma poata lasa sa am numar inegal de date pentru fiecare camera in parte.
+
+Dupa aceasta prima tentativa esuata am decis sa fac implementarea intervalelor orare cu liste, fiindca
+oricum le puteam ordona foarte usor din constructor, in momentul initializarii celor 24 de intervale,
+iar datele de temperatura si umiditate voiam sa le stochez cu ajutorul unui Set sortat, crezand ca
+SortedSet este o clasa. Ulterior, dupa ce mi-am facut clasele care sa reprezinte celule ale setului sa
+implementeze Comparable si sa suprascrie "compareTo", am citit mai atent si am observat ca SortedSet
+este o interfata nu o clasa si ca se implementeaza cu Set sau cu TreeSet (TreeSet mi s-a parut greoaie
+de folosit avand in vedere faptul ca tema era structurata liniar, lucruri succesive, ordonate
+crescato/descrecator). Dupa toate aceste dificultati m-am decis ca cel mai sigur si eficient ar fi sa
+folosesc ArrayListuri si utilizand metodele ei in metode proprii sa impun anumite aspecte
+(elemente unice, ordonare, etc).
+
+Principala dificultate in rezolvarea temei am avut-o cu calcularea mediei pentru trigger heat, deoarece din weighted mean intelegeam ca se va face o medie dublu ponderata a tuturor temperaturilor
+din ultima ora, din fiecare camera (adica suma de temp*durata_acestei_temperaturi*suprafata_camerei
+totul supra 1h*suprafata_totala). Cu gandul la implementarea acestui fel de trigger in minte pornisem
+diversele incercari de modelare a bazei de date cu hashtable, fiindca practic as fi avut nevoie de o
+dubla ordonare, principala ordine fiind data de temperaturi si cea de-a doua de durate de timp
+(clasa Durata a aparut gandindu-ma ca o folosesc in 3 locuri interval orar, celula_temperatura si
+celula umiditate, timestampul dat cu fiecare celula fiind unul din capetele intervalului de timp in
+care se gaseste temperatura/umiditatea) pentru a manevrara cu usurinta temperaturile si perioadele
+corespondente acestora in calcularea mediei. Insa, cand am recitit mai atent cerinta, mi-am dat seama
+ca lucrurile erau mai accesibile decat le gandisem eu complicat :)).
+
+O alta problema, din cauza careia am rescris functia list de 3 ori, a fost ca, pentru a incerca sa
+simplific complexitatea algoritmului, am complicat implementarea. Voiam, pentru a nu parcurge toate
+intervalele orare si a afisa doar temperaturile cu timestampii buni, sa restrictionez intervalul
+primit ca parametru la o serie de intervale orare comparand limitele superioara si inferioara.
+De exemplu daca se dadeau inferior 12:36, superior 16:50, programul ar fi trebui sa ia intervalul (12,
+17) si sa afiseze din el temperaturile intre 12:36 si 16:50, insa dupa 2 incercari in care outputul ba
+era mult mai mare, ba era mult mai mic decat referinta. Am decis ca desi cresc complexitatea cel mai
+simplu este sa compar tot si sa afisez doar ce respecta intervalul initial dat ca parametru, fara
+constrangeri ajutatoare.
+
+O observatie finala este ca am probleme la crearea javadocului despre care am discutat cu Domnul
+Profesor, dar tot nu am reusit sa le rezolv.
+Desi un echo pe $path sau java home demonstreaza existenta acestora. Eclipse nu imi creeaza
+htmlul, ci doar folderul gol, motivand cu eroarea 13 "Permission denied" care este cauzata de lipsa
+unui path catre java home. Am incercat diverse metode prezentate pe stackoverflow si pe forumul oracle
+pentru a solutiona aceste probleme, insa fara sorti de izbanda.
+
+Restul informatiilor despre implementarea metodelor, alte probleme intalnite in rezolvarea temei,
+parametrii si functionalitati le-am aprofundat in comentarii in fiecare clasa. :D
+
+O zi buna si multumesc pentru citire! \^_^/
+
+༼ つ ◕_◕ ༽つ TEMA 2 TAKE MY ENERGY ༼ つ ◕_◕ ༽つ
