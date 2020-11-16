@@ -1,0 +1,148 @@
+============================================ README TEMA 2 AA ========================================
+========================================== Chiru Catalin-Mihail ======================================
+================================================= 322CB ==============================================
+
+(Am scris README-ul in Fullscreen)
+
+Initial am descoperit acest paper[1] online si l-am citit pentru a intelege care ar fi o idee de 
+	implementare a reducerii HCP <=p SAT.
+[1]https://arxiv.org/pdf/cs/9903006.pdf
+Vazand la cat de putine clauze se reduce intreaga problema am incercat sa implementez ideea insa
+constructia lui F2 (obtinerea laturilor din afara oricarui alt ciclu mic) mi-a dat multe batai de cap,
+si am decis sa abandonez aceasta directie.
+
+Dupa ce am mai citit cateva articole online referitoare la acest subiect mi-am dat seama ca imi complic
+munca si ca cel mai intelept ar fi sa urmaresc enuntul temei, sa urmaresc inputurile si refurile si,
+pornind de la acestea sa inteleg transformarea, sa o implementez si sa explic ce elemente o fac valida.
+
+Initial in locul Matricei de adiacenta (in care existenta muchiei e simbolizata cu 1, lipsa ei cu 0 si
+	faptul ca doresc muchie de la nod in el insusi cu -1) foloseam un ArrayList in care tineam minte
+	pentru fiecare nod vecinii sai. Insa am renuntat la aceasta abordare imi era greu sa implementez
+	cod neparticularizat pe un anumit numar de vecini si apareau multe conditii suplimentare in care
+	ma pierdeam.
+
+Comentariile referitoare la restul implementarii si la motive le-am adaugat in cod, asadar aici voi 
+	justifica timpul de executie polinomial al transformarii.
+
+Desi, pe tot parcursul temei si chiar si acum am o nesiguranta cu privire la un aspect:
+Daca presupunem scrierea/creearea unei clauze ca are complexitatea O(1) din perspectiva timp.
+Pentru cazul dat in exemplu avem un graf cu 3 noduri, iar numarul clauzelor este 20, iar e^3~=20.08
+Sunt constient ca in testele din referinta (spre exemplu testul 1), pentru 4 noduri avem mult mai putin
+de e^4~=54.6 clauze, dar fiecare clauza creste mult in literali pe masura ce numarul de noduri creste.
+
+In ceea ce priveste algoritmul voi demonstra acum ca timpul metodei HCP2pSAT este polinomial:
+Voi presupune ca operatiile de tipul
+str_buffer.append()/
+str_buffer.deleteCharAt(str_buffer.length-1) au complexitate mica, O(1) si acest aspect poate fi
+	justificat daca ne gandim la o implementare a lor cu un Iterator care tine minte unde se afla \0
+
+https://www.programcreek.com/2013/03/arraylist-vs-linkedlist-vs-vector/
+Consideram add si get pentru ArrayList O(1)
+
+Vom considera n=numarul de noduri ale grafului=graph.V-1;
+Si vom aplica niste aproximari grosiere spre rau (worst-case) pentru a nu complica analiza, deoarece
+interesul nostru este sa aratam ca timpul este polinomial, nu sa stabilim cu exactitate constanta termenului
+dominant.
+
+Asadar in situatii in care voi avea spre exemplu:
+
+for(i=1, i<n, i++) {
+   for(j=i, j<n, j++) {
+   
+     ....O(1)
+   }
+}
+Voi considera automat ambele foruri de la 1 la n si deci complexitatea acestui exemplu va fi direct O(n^2). (*)
+
+La fel si pentru i de la 1 la (n)/2+1 pentru simplitate i-ul va merge de la 1 la n. (**)
+Sau
+for(i=1, i<n, i++) {
+   for(j=1, j<i, j++) {
+   
+     ....O(1)
+   }
+}
+i de la 1 la n, j de la 1 la n => prin imbricare O(n^2) (***).
+
+Avem metoda principala HCP2pSAT:
+
+public static void HCP2pSAT(Graph graph, StringBuilder str_builder) {
+		if (graph.V-1 == 1) { // graful trivial cu un singur nod
+			str_builder.append("x1-1 | ~x1-1\n");
+			return;
+		}
+		
+		if (Graph.hasNoCycle(graph)) {
+			str_builder.append("x1-1 & ~x1-1");
+			return;
+		}
+		
+		Graph.writeNodeConnections2SAT(graph, str_builder, 1);
+		for (int i = 2; i < graph.adjMatrix.length; i++) {
+			Graph.writeNodeConnections2SAT(graph, str_builder, i);
+			Graph.writePossibleDistances2SAT(graph, str_builder, i);
+		}
+		Graph.writeTautologies(graph, str_builder);
+		Graph.writePathLengthsFromStartingVertex(graph, str_builder);
+		Graph.writePahtsFromEachNodeToEverywhere(graph, str_builder);
+		str_builder.deleteCharAt(str_builder.length()-1);
+}
+
+Modularizata in metode mai mici
+Exista urmatoarele situatii:
+N=1 (In algoritmul meu 2 fiindca V=N+1)
+Caz in care avem conditia din if =O(1)+ append=O(1)+ return => O(1) polinomial
+
+Cazul in care N>1, dar graful nu are muchii satisfacatoare (exista noduri care au 1 sau 0 muchii)
+Conditia de verificare din if "Graph.hasNOCycle" este O(n^2) deoarece intr-un for de la 1 la n se apeleaza
+	o metoda care la randul ei contine un for de la 1 la n care predomina.
+	O(n^2)+append (O(1))+ return => O(n^2) polinomial
+
+Cazul in care nu se paraseste functia prin niciunul din cele 2 if-uri, avem:
+	O(1)+O(n^2) (verificarile de intrare in if se executa oricum) + T(writeNodeConnections2SAT(nodul 1))+
+	+T(writeNodeConnections2SAT(toate nodurile in afara de 1))+ T(writePossibleDistance2SAT(toate nodurile
+											in afara de nodul 1)+
+	+T(writeTautologies)+T(writePathLengthsFromStartingVertex)+T(writePahtsFromEachNodeToEverywhere)+O(1)
+										     (de la delete last char)
+
+
+
+writeNodeConnections2SAT:
+	Conditia if-ului O(n)+O(n) (executarea branchului interior ifului care contine un for dominant) => O(n)
+	Else O(n)+O(n) (daca nodul curent are muchii cu toate celelalte noduri, poate avea N-1 vecini de adaugat
+			in ArrayList)
+	     +O(n^3) (h merge de la 1 la vecini.size(= worst_case N-1), i merge de la 1 la N-1 (cf (*)), j la fel)
+	Else O(n)+O(n)+O(n^3)=> O(n^3)
+
+Vom considera deci de acum writeNodeConnection2SAT ca avand complexitatea O(n^3) (alegem worst case)
+	=> T(writeNodeConnections2SAT(nodul 1))+T(writeNodeConnections2SAT(toate nodurile in afara de 1))=n*O(n^3)
+	=> O(n^4)
+
+writePossibleDistance2SAT:
+	Are un for de la 1 la n in care se executa o operatie elementara => O(n) si in rest operatii elementare
+	O(n)+O(1)=>O(n)
+
+	=>T(writePossibleDistance2SAT(toate nodurile in afara de nodul 1)=n*O(n) => O(n^2)
+
+writeTautologies:
+	Situatia de la (*) doua foruri imbricate considerate worst case de la 1 la n si in interiorul acestora
+	un if de complexitate O(1) si o operatie elementara O(1)
+	=> T(writeTautologies)=O(n^2)
+
+writePathLengthsFromStartingVertex:
+	2 foruri independente de la 2(il vom considera 1) la N, si de la 1 la N cu if+operatie elementara
+	O(n)+O(n)
+	=> T(writePathLengthsFromStartingVertex)=O(n)
+
+writePahtsFromEachNodeToEverywhere:
+	2 foruri imbricate mari de la 2 la n/2+1 (**), respectiv de la 2 la n, in care se gasesc operatii elementare
+	si inca 4 foruri mici, 2 de la 1 la i (***) si 2 de la 2 la n, care contin doar if + operatie elementara =>
+        O(n*n*(a*O(1)+4*O(n)) unde a>0 => O(n^2*n) => O(n^3)
+	=> T(writePahtsFromEachNodeToEverywhere)=O(n^3)
+
+Adunam complexitatile si obtinem complexitatea lui HCP2pSAT si implicit a reducerii:
+	T(HCP2pSAT)=O(1)+O(n^2)+O(n^4)+O(n^2)+O(n^2)+O(n)+O(n^3)=O(n^4)
+
+Rezulta ca intr-adevar, timpul transformarii este polinomial worst-case scenario.
+
+Multumesc pentru citire! Zi frumoasa! :D
