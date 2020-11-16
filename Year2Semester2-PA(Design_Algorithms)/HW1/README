@@ -1,0 +1,144 @@
+=========================================== README Tema 1 PA =========================================
+========================================== Chiru Catalin-Mihail ======================================
+================================================= 322CB ==============================================
+
+Avand in vedere faptul ca implementarile au fost explicate exhaustiv in comentariile din cod,
+	in README ma voi concentra pe 2 sectiuni: Fails & Fixes si Complexitatea finala a algoritmilor
+
+Fails & Fixes:
+	
+	Coding style:
+	Toate probleme au fost formatate automat folosind functia IDEului Eclipse 2019-12
+	insa, din cauza trickului facut pentru a evita overflowul de la problemele 1 si 3
+	formatarea automata depaseste numarul de caractere permise per linie (100), in consecinta,
+	aceste probleme au fost formatate de mana dupa formatarea automata.
+	(Cred ca exista un workaround pentru a se stabili o limita maxima de 100 de caractere
+	astfel incat Eclipse sa spatieze altfel, insa nu am gasit solutia aceasta)
+
+	Overflow avoidance:
+	Pentru a evita situatii de overflow, la problemele cu rezultate mari specificate am folosit
+	formulele matematice:
+	(a + b) % MOD = ((a % MOD) + (b % MOD)) % MOD
+	(a ∗ b) % MOD = ((a % MOD) ∗ (b % MOD)) % MOD	
+	luate din Laboratorul 1:
+	https://ocw.cs.pub.ro/courses/pa/laboratoare/laborator-01
+
+	Problema 1:
+	Pentru lizibilitatea codului si crezand ca O(N) este o complexitate buna la problema 1
+	toata rezolvarea reprezenta codul corespunzator acum posibilitatii if(instructiune==2) true
+	cu o mica modificare in cadrul forului: 
+	var_crt_100lei = (((variante10lei % kMod) + (variante100lei % kMod)) % kMod
+			+ ((instructiune == 2) ? ((variante200lei % kMod)) % kMod) : 0);
+	Caz in care atat pentru tipul 1, cat si pentru tipul 2 s-ar fi aplicat tehnica de DP
+	Ulterior vazand ca din cauza dimensiunii mari (10^9) testele de tip 1 pica. Am decis sa nu
+		mai folosesc programare dinamica pentru acest tip si sa ma bazez pe formula 
+		justificata in cod, putand prin ridicare la putere cu Divide Et Impera sa reduc N
+		la Log N
+
+	Din cauza problemei 1 am devenit foarte sceptic cu incadrarea in timp si pentru urmatoarele
+	probleme nu am mai modularizat codul (gandindu-ma ca asa voi mai salva timp).
+	Totodata, abordari cu vectori si matrici de tipul
+	for(int i ...) {
+		Object crt_object = array.get(i);
+		modificari asupra crt_object.attribute;
+	}
+	Sunt datorate reducerii timpului. Am observat pe teste de la Bonus ca acest mod de lucru
+	poate reduce de 5 ori timpul in detrimentul folosirii get pentru orice
+	(Eu initial credeam ca dupa primul get compilatorul e smart si il tine minte undeva pentru
+	utilizari ulterioare Haskell-alike. But I was soo wrong :))  )
+
+	Problema 2:
+	Ideea problemei a venit pornind de la o problema de Divide Et Impera de la curs in care
+	puncte din plan 2D se ordonau dupa coordonata X pentru a fi manipulate mai usor.
+	Am avut o problema cu faptul ca nu ma gandisem la corner caseul in care gardurile vor avea
+	x egal (puneam la compareTo return 0) si situatii precum [4,6], [4,100] erau reprezentate
+	astfel in loc de [4,100], [4,6], iar algoritmul asa cum este construit numara ca totul este
+	in regula updata current_end cu 100 si trecea mai departe. Puse invers face ce trebuie:
+	ramane current_end de la primul element, 100 > 6, redundats ++;
+
+	Problema 3:
+	Prima idee implica o matrice dp[i][j] unde reprezentarea matricei era de tipul, in cate
+	moduri poate lua copilul i+1 j bomboane, mergand intr-o recursie pe baza exemplului din
+	tema:
+	(1,1,4), (1,2,3), (2, 0, 4), (2,1,3), (2,2,2), (3,0,3), (3,1,2)
+		(In acest exemplu dp[0][1] = 2)
+	Dar am realizat ca aceasta abordare implica backtracking ceea ce nu este deloc optim si
+	nu este necesar.
+	Urmatoarea idee a fost cea de implementare a unui DP de tip Rucsac si aceasta a si ramas.
+	Este singura problema in care calculez pe masura ce extrag inputul pentru a reduce din
+	timpul de executie. As fi facut acest lucru si la 2 si 4, insa m-am gandit ca poate sort
+	facut de java are optimizari fata de ce as putea face eu inserand sortat in vector pe
+	masura citirii inputului.
+	O alta problema pe care am mai avut-o a fost considerarea implicita a ideii:
+	0<= minim_bomboane_copil <= maxim_bomboane_copil <= M
+	fapt ce rezulta in Run time errors pe testele 3 si 5 de pe checkerul local.
+	Workaroundul a fost ca in cadrul for i = [start, stop] sa introduc conditia:
+	if (j == (M + 1)) {
+		break;
+	}
+
+	Problema 4:
+	Initial uitam sa elimin varful min_heapului si surprinzator treceau teste grele, ceea ce
+	m-a incurcat punandu-ma sa fac mult debugging
+	Ideea problemei 4 a venit din adaptarea ideii de la 2 si gasirea unei structuri care nu
+		este costisitoare la eliminare (min_heap/priority_queue).
+	Totodata, am mai avut probleme incercand sa tin un min_heap de clasa Gantera, dar incurca
+	compareTo scris pentru sortarea vectorului de gantere si atunci am decis pastrarea doar a
+	repetarilor sub forma de PriorityQueue<Integer>
+
+
+Complexitati:
+	
+	Problema 1:
+	Vom considera infima prelucrarea inputurilor in comparatie cu algoritmul nostru, deci
+	Deschideri/inchideri de reader, printer, citirea liniei, splitul, parsari de int/long
+		printarea rezultatului le consideram O(constant)
+
+	Pentru tipul de instructiune 1:
+	Avem 5*2^(n-1), ridicarea la putere o facem in O(log N) si inmultirea in O(1).
+	Overall, complexitate temporala O(log N)
+	Pentru tipul de instructiune 2:
+	Instantieri de variabile: O(constant)
+	For [1, N-1] in care se fac adunari si atribuiri: N*O(constant)=O(N)
+	Overall, complexitate temporala O(constant)+O(N) = O(N)
+
+	Problema 2:
+	Lucram cu un vector in care ajung toate perechile ce caracterizeaza un gard
+	Deci, complexitate spatiala: O(N*sizeof(Pair))
+	Parcurgem o data prima linie si toate perechile in momentul in care citim din fisier:
+		O(N+1)
+	Sortam vectorul crescator dupa start: Theta(N*Log N)
+	Mai parcurgem o data vectorul pentru a determina bucatile redundante: O(N)
+	Overall, complexitate temporala O(N)+O(N)+O(N*Log N) = O(N*Log N + 2*N) = O(N* Log N)
+		
+	Problema 3:
+	Avem un ArrayList de ArrayListuri de integeruri, deci un tablou de dimensiune NxM
+	Ceea ce inseamna o complexitate spatiala O(N*M*(sizeof(Integer))
+	Zeroizam tablou, ceea ce inseamna: O(N*M)
+	Completam tabloul pe masura ce citim date, consideram worst case ca start si stop sunt
+		intotdeauna egale cu 0, respectiv M, pentru i=0 avem for j =[Start, Stop],
+		deci pentru i=0 O(M) temporala.
+	Pentru i de la 1 la N-1, avem un for j =[0,M], in care mai avem un for de la 0 la j, in
+		acesta avem o suma O(constant) si in afara sa o atribuire O(constant)
+	0+1+2+...+M = M*(M+1)/2. Deci O(N*M*(M*(M+1)/2))=O(N*M^3)
+	Overall O(N*M)+O(N*M^3) = O(N*M^3)	
+	
+	Problema 4:
+	Lucram cu un vector in care ajung toate perechile ce caracterizeaza toate ganterele
+	si cu un PriorityQueue in care tinem maxim M elemente alocate
+	Deci, complexitate spatiala: O(N*sizeof(Gantera))+O(M*sizeof(Integer)) dar cum M<<N si
+	Integer<Gantera = O(N*sizeof(Gantera))
+	Parcurgem o data prima linie si toate perechile in momentul in care citim din fisier:
+		O(N+1)
+	Sortam vectorul descrescator dupa valoare: Theta(N*Log N)
+	Mai devreme sau mai tarziu adaugam toate cele N elemente in PriorityQueue ceea ce inseamna:
+		N*O(M*Log M)=O(N*M*Log M)
+	Si worst case cea mai buna combinatie e data de ultimele M elemente ceea ce inseamna ca am
+	extras (N-M) elemente pe tot parcursul algoritmului: (N-M)*O(log M) = O((N-M)logM)
+	Overall, complexitate temporala O(N)+O(N*Log N)+O(N*M*Log M)+O((N-M)logM), dar considerand
+	veridica euristica M << N factorul decisiv pentru N foarte mare este O(N*Log N)
+
+
+That's about it!
+Multumesc pentru citire! Zi frumoasa :D!
+
