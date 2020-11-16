@@ -1,0 +1,40 @@
+=========================================== README Tema 3 PC =========================================
+========================================== Chiru Catalin-Mihail ======================================
+================================================= 322CB ==============================================
+
+Makefileul este o adaptare a celui de la Tema 2 de TCP, UDP
+
+Am pornit implementarea temei de la scheletul laboratorului 10 "Protocolul HTTP" din care am luat
+helpers.c/.h
+buffer.c/.h
+
+Am reimplementat requests.c/.h in conformitate cu nevoile programului (nu avem nevoie de o lista de
+cookieuri sau de numarul de cookieuri in concatenarea mesajului, cand stim sigur ca putem avea maxim
+1 cookie, avem nevoie de o variabila prin care sa parasam tokenul
+
+Din cauza presiunii timpului am utilizat mecanismele de parsare a jsoanelor implementate in sursele
+parson.c/.h, descarcate de la linkul de github prezentat in tema.
+
+Am decis restrictionarea anumitor capacitati ale clientului inca din scheletul de cod al acestuia (sa nu dea dublu login, sa nu dea log out daca nu e conectat, sa nu aiba acces la carti daca nu detine un
+token JWT) pentru ca mi s-a parut firesc sa nu ii las clientului posibilitatea de a face flood la server cu cereri inutile.Totusi, ar afisa corespunzator mesajelor de eroare transmise de catre server,
+daca i s-ar permite interactiunea cu acesta in cazuri faulty. Mai mult decat atat, actualizarea logged_in
+este in stransa legatura cu raspunsul serverului (updatam logged_in doar daca login/logout au succes si serverul ne intoarce mesajul aprobator: "HTTP/1.1 200 OK".
+
+Pentru login/register, pe baza unui post pe forum am decis ca userul si parola sa aibe 40 de caractere, si sa le aloc static pentru a nu incarca tema cu warninguri de calloc esuat.
+
+Pentru a nu avea probleme cu time-out pe conexiune de la server, am vazut de pe forum ca ne este
+permis sa deschidem conexiunea/socketul, sa transmitem comanda si sa inchidem conexiunea daca au fost
+respectate cerintele din mainul clientului, asa ca am implementat aceasta idee.
+
+Functiile au parametrii in functie de necesitatile lor. Spre exemplu, chiar daca avem un token si un
+cookie valid in momentul in care dam register, acest lucru nu ne afecteaza crearea mesajului
+corespunzator comenzii, deci nu are sens sa incarcam stiva inutil parsandu-le.
+
+Am pus get_book inaintea lui get_books crezand ca uneori clientul face matching gresit, insa apelam
+in ambele situatii get_books XD.
+
+Restul detaliilor despre implementare se afla in client.h, client.c, client_functions.c.
+
+
+Multumesc pentru citire,
+Seara frumoasa! ^_^
