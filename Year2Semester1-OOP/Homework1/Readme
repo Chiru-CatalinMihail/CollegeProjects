@@ -1,0 +1,31 @@
+Chiru Catalin-Mihail
+322 CB
+
+Am decis implementarea cu vectori datorita usurintei parcurgerii lor si a faptului ca primul bonus nu fusese postat in momentul scrierii principalelor functii :D
+
+Majoritatea problemelor pe care le-am intampinat au avut legatura cu scrierea in fisier. Initial, problema era ca incercam sa deschid la fiecare afisaj fisierul de output si sa scriu fara a face apend ceea ce suprascria intreg continutul de fiecare data.
+Pentru a simplifica mult afisarea recursiva am decis sa am un StringBuilder pe post de buffer in constructia heapului in care sa bag de fiecare data prezentarea in preordine ("s1_s2_s3_g1_f1_g2_"). Dupa fiecare astfel de insiruire cauzata de list am decis sa sterg ultimul caracter '_' si sa pun in locul sau "\n", iar in momentul terminarii parcurgerii inputului ultimul '\n' sa fie la randul sau sters.
+
+Alta problema intalnita ulterior referitoare la scrierea in fisier a fost ca verificarea locala a temei am facut-o cu diff care imi arata la inputuri identice diferenta pe linie. Exemplu
+outputul meu vs outputul din teste
+1c1
+g1 s2 s1
+s1 s2
+
+---
+g1 s2 s1
+s1 s2
+
+Aceasta problema era datorata existentei caracterului special "\r" utilizat in windows pentru newline. Dar la urcarea pe vmchecker s-a rezolvat.
+
+O alta problema am avut-o din cauza citirii din input. Pentru a-mi prelucra comenzile faceam split dupa regexul [ \n\r] si uneori ramanea un String de tip "bucata" care nenorocea executia :^)
+Nemultumirea vmcheckerului a aparut mai ales la testarea conditiei if(linereader.charAt(0)=='i') care desi pe local functiona fara probleme primea Exceptia StringIndexOutOfBounds si o data cu ea run error la make. Am rezolvat aceasta inconvenienta folosind metoda contentEquals (pentru embark si list) si contains (pentru insert).
+
+Ultima eroare pe care am intampinat-o si de care nu am reusit sa scap a aparut la crearea javadocului.
+Mediul meu nu stabileste o cale absoluta pe care acesta sa creeze htmlul. Am cautat pe stackoverflow si pe geeksforgeeks si am gasit tot felul de solutii (scris cu gedit in /etc/profile, umblat in /etc/environment, incercat sa il fortez cu nano sa recunoasca /usr/lib/java ca home, mutat pe windows, am incercat si resetarea si schimbarea workspaceului si tot nu am reusit sa trec peste acest inconvenient. Nu imi dau seama de ce nu seteaza java_homeul si path-ul unde trebuie/il oblig sa o faca. Am incercat 3 ore toate variantele aaaannnndddd... no success :( (Anexez in arhiva 3 imagini cu eroarea pe care o primesc cand incerc sa generez javadocul)
+
+Restul informatiilor despre implementarea metodelor parametrii si functionalitati le-am aprofundat prin comentarii in fiecare clasa. :D
+
+O zi buna si multumesc pentru citire! \^_^/
+
+༼ つ ◕_◕ ༽つ TEMA 1 TAKE MY ENERGY ༼ つ ◕_◕ ༽つ
