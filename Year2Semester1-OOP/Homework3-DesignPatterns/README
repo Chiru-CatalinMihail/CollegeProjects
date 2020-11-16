@@ -1,0 +1,86 @@
+Chiru Catalin-Mihail
+322 CB
+
+Taskul 1:
+Pentru taskul 1, avand in vedere Laboratorul 9. M-am gandit imediat sa folosesc Factory si Singleton astfel:
+
+Sa creez o Clasa TeamFactory prin care vor fi create echipe in functie de tip,
+iar FactorySingleton, un Singleton care asigura instantierea si existenta unica a unui TeamFactory.
+La taskul 1 dupa ce este prelucrat inputul, sunt create echipele (elemente ale unui ArrayList), sunt
+populate cu jucatori si afisate conform cerintei.
+
+Taskul 2:
+Taskul 2 l-am inceput de la coada la cap. M-am gandit ca cel mai greu imi va fi sa adaug ulterior
+Strategy la intreaga implementare asa ca cel mai intelept ar fi sa incep de la el si sa imi modelez
+intreaga implementare dupa asta. (Damn, was I wrong :))) )
+
+Am pornit initial cu strategiile care sunt si acum: Interfata PlayingStrategy, dupa care clasele:
+BasketballStrategy, HandballStrategy, FootballStrategy, care calculeaza in functie de gen scorul.
+
+Nestiind ce va fi la Visitor mi-am scris in Team metodele: obtainMax, obtainMin, sum, product, mean,
+pe care le apelam corespunzator din fiecare metoda calculateTeamScore.
+
+Dupa am trecut la Visitor. Din ce am inteles eu din filozofia acestui design pattern, ideea e sa nu se
+realizeze actiuni din clasa vizitata, ci cel care viziteaza sa modeleze cu informatiile pe care le
+primeste de la vizitabil si sa storeze undeva atributul de interes pe care l-a prelucrat si obtinut.
+
+Asadar, BURN EVERYTHING! Glumesc, am sters toate metodele obtainMax,Min, etc din Team si le-am
+integrat corespunzator in fiecare strategie, in functie de tipul competitiei si de gen. 
+
+Pentru Fotbal am decis implementarea cu suma+Maxim/minim datorita complexitatii. Decat sa parcurg de
+2 ori, o data pentru maxim/minim si o data pentru suma fara acesta. Am complexitate mai mica sa adun
+suma in timp ce caut maximul/minimul dupa care sa il adaug o singura data la final, deja existand in
+suma tuturor scoreurilor #MATHHACKS :))
+
+Intai de a trece la Visitor vreau sa fac o observatie la intelesul a doua cuvinte in implementare.
+Scor=scorul unei echipe obtinut cu regulile stabilite in functie de cati si ce jucatori are
+Punctaj=punctajul obtinut de fiecare echipa, in functie de care se pozitioneaza in clasament
+
+Moving on. Pentru design patternul Visitor avem interfetele: Visitable (implementata de Team) si
+Visitor (implementata de TeamVisitor). Acest design pattern il folosesc astfel:
+Se joaca meciurile din competitie de la echipa 0 joaca cu toti in afara de sine, echipa 1 toti in
+afara de sine si de 0, etc. La fiecare meci, o echipa este cea din care se apeleaza metoda iar
+cealalta este data ca parametru, alaturi de Visitorul ei. In metoda playOtherTeam se instantiaza si
+TeamVisitorul echipei gazda si pe baza celor 2 vizitatori se compara scorurile echipelor si se ofera
+puncte corespunzator.
+
+Initial implementarea era sa trec cu cate un nou TeamVisitor pe la fiecare echipa si sa ii calculez
+scorul pe care ulterior il foloseam in playOtherTeam la comparatie, dar Dragos a zis sa nu avem campul
+scor in Team.
+
+Acum partea cu adevarat dramatica: the OBSERVER :))
+Am oscilat mult in felul cum voi folosi Observer, initial aveam Subiectul Competitia si Observerul
+Echipa si ceea ce se facea prin design patternul de Observer era ca in playOtherTeam Echipa
+sa anunte ca s-a jucat un meci si punctele s-au dat conform cerintei, iar clasamentul se actualiza
+o singura data, la sfarsit.
+
+Dupa mult research, citit Labul 10 si vazut observatia lui Dragos. Mi-am dat seama ca implementarea
+asta nu are niciun sens si ca legatura ar trebui sa fie intre Clasament si Echipe si ca locul ocupat
+de fiecare echipa ar trebui sa se schimbe dupa fiecare meci. Asa ca era clar: Am nevoie de o noua
+clasa Clasament.
+
+Dupa o zi in care m-au rapit extraterestrii (ca altfel nu imi pot explica ce urmeaza sa marturisesc),
+in care am schimbat de 7 ori cine e Observer si cine e Subject intre Clasament si Echipe fiindca eu
+gaseam argumente solide in momentul schimbarii pentru cealalta varianta :)).
+
+S-a luminat cerul si am reinceput sa gandesc (mult spus).
+
+Clasamentul e Subiectul pentru ca el este obiectul de interes al tuturor echipelor care "observa 
+competitia". Asadar, am adaugat campul pozitia_in_clasament pentru a avea sens notificarea de la
+clasament catre toate competitiile (actualizeaza pozitia curenta).
+In acelasi timp, "update" are sens acum. Dupa ce in urma meciului punctele sunt distribuite echipelor,
+acestea notifica clasamentul ca au avut loc modificari si deci trebuie reactualizat.
+
+Inainte sa inchei mai am o mica observatie de facut referitor la tema mea. Nu mi se genereaza javadoc.
+Am vorbit cu Domnul Dascalu la curs, dar tot nu am reusit sa repar acest inconveniet. Cred ca Eclipse
+considera mediul meu neinitializat (primesc Permission denied: Error 13, iar pe StackOverflow zice ca
+asta ar fi problema), in schimb Ubuntu la un echo pe path sau pe java intoarce calea absoluta catre
+locul unde isi are stabilit mediul.
+
+Aannddd, that's about it.
+
+Restul informatiilor despre implementarea metodelor parametrii si functionalitati le-am aprofundat prin comentarii. :D
+
+O zi buna si multumesc pentru citire! \^_^/
+
+༼ つ ◕_◕ ༽つ TEMA 3 TAKE MY ENERGY ༼ つ ◕_◕ ༽つ
