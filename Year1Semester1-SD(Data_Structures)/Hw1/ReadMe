@@ -1,0 +1,85 @@
+//Chiru Catalin-Mihail 312CB
+Am decis impartirea structurilor date din ipoteza in 3 substructuri pentru a 
+	parcurge cu usurinta formatul.
+
+Fiecare structura reprezinta o lista simplu inlantuita cu o informatie aferenta
+
+Am separat structurile intr-un fisier header pentru o mai buna organizare.
+
+Deoarece consider anevoios lucratul cu stringuri, am folosit define pentru a-mi
+	inlocui comenzile cu numere.
+
+Mi-am creat propria functie mystrdup deoarece compilatorul meu 
+	nu recunoaste functia strdup, desi am folosit si biblioteca string.h si
+	defineurile aferente ei (nu stiu de ce face asta).
+
+Totodata, am creat functia myconcat care aloca dinamic si concateneaza doua
+	stringuri pentru a-mi putea scrie istoricul mult mai usor.
+
+Exista doua functii care implica alocarea unui element TLL deoarce am dorit sa
+	individualizez initializarea listei cu indexul 0.
+
+Am ales ca majoritatea informatiilor sa fie char* desi sunt numere deoarece pot
+	incepe cu cifra 0 si este nevoie sa o inregistram si pe aceasta.
+
+Faptul ca folosesc pointeri se datoreaza accesibilitatii si reducerii 
+						consumului de memorie.
+
+Deoarece atoi poate converti pana la valori de tip long int si 
+	card_number convertit ar fi de tipul unsigned long long, 
+	nu putem folosi functia pentru a obtine suma. 
+	Asa ca am convertit cifra cu cifra numarul cardului.
+
+Avand nevoie de multe verificari de memory leakuri si deci de multe
+	free-uri mi-am creat functia DistrElem care elibereaza 5 
+	char *. 
+
+UPDATE: Din cauza faptului ca verificarea colectiva a alocarilor 
+	s-a dovedid ineficienta (se elibereaza informatie care nici nu a apucat
+	sa fie alocata), de la insert am inceput sa verific individual fiecare
+	alocare si sa eliberez in cazul in care exista erori+ coduri de eroare
+	Sunt constient ca a incarcat foarte mult codul si ca se putea face 
+	probabil modular cumva, insa alternativele pe care le-am gasit nu
+	eliberau tot si atunci am hotarat sa fac ceva ce sigur este corect.
+
+Deoarece initial nu am realizat cat de necesar imi va fi pozitionarea fix pe
+	cardul al carui numar il stiu, la functia add_card se apeleaza
+	verifica_identic care acopera mai multe situatii (alaturi de lc_pe_poz
+	indeplinind mare parte din functionalitatile add_card). Deoarece am
+	intampinat dificultati in a-mi redimensiona in afara functiei de add
+	(se redimensiona nestiind daca cardul exista deja sau nu in baza de 
+	date), m-am gandit ca singura operatie care declanseaza redimensionarea
+	este add_card si atunci dupa verificarea duplicitatii se verifica 
+	necesitatea redimensionarii si in caz pozitiv se efectueaza.
+
+Ulterior de la functiile care presupuneau implicit existenta cardului am 
+	folosit	gaseste_card.
+
+Similar, pana sa imi dau seama ca voi folosi de mai multe ori parcurgerea
+	listelor pana la lista cautata, am facut cautarea listei in cadrul
+	functiei respective si am specializat-o.
+
+Dupa ce mi-am dat seama, am folosit gaseste_LSC.
+
+Pentru a sterge am hotarat ca ar fi mai inteligent sa gasesc legatura de 
+	dinaintea careia se rupe asa ca am creat gaseste_precedent.
+	Initial am vrut sa folosesc gaseste_card folosind while(aux->urm),
+	dar complica functionalitatea celorlalte functii majore.
+
+Functiile cele mai importante in care se gasesc celelate functii modularizate
+	sunt asezate in ordinea utilizarii lor pe parcursul testelor si sunt
+	urmate de int main.
+
+In int main, este citit inputul, se sparge in linii, liniile sunt sparte in
+	comenzi, apelate cu ajutorul define-urilor cum am explicat anterior.
+	Dupa care, pana cand se termina comenzile, se trece fiecare comanda
+	printr-un switch si se indeplineste functionalitatea sa. Dupa care
+	se inchide outputul si se elibereaza memoria.
+
+Am incercat sa lucrez cat mai modularizat, in afara eliberarilor de memorie
+	de dupa insert care sunt utilizate pe principiul "Am terminat de
+	utilizat ceva eliberez si imi aloc ulterior daca este necesar"... si apoi
+	mi-am eliberat cu valgrind unde am vazut ca au mai ramas leakuri.
+
+Imi cer scuze pentru intarziere :D.	
+
